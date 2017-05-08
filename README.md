@@ -1,6 +1,8 @@
 # Vulkan
 Getting familiar with Vulkan API
 
+NOTE: the commit history lost during import from bitbucket
+
 The repository follows this tutorial: 
 https://vulkan-tutorial.com/
 

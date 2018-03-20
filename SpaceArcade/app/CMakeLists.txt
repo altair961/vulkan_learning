@@ -28,7 +28,7 @@ add_library( # Sets the name of the library.
              SHARED
 
              # Provides a relative path to your source file(s).
-             src/main/cpp/Main.cpp )
+             src/main/cpp/main.cpp )
 
 #Specifies a path to native header files.
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}

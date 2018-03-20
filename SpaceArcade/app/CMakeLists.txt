@@ -11,13 +11,28 @@ cmake_minimum_required(VERSION 3.4.1)
 # Gradle automatically packages shared libraries with your APK.
 
 add_library( # Sets the name of the library.
+             app-glue
+
+             # Sets the library as a static library.
+             STATIC
+
+             # Provides a relative path to your source file(s).
+             # Associated headers in the same location as their source
+             # files are automatically included.
+             ${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c )
+
+add_library( # Sets the name of the library.
              native-lib
 
              # Sets the library as a shared library.
              SHARED
 
              # Provides a relative path to your source file(s).
-             src/main/cpp/native-lib.cpp )
+             src/main/cpp/Main.cpp )
+
+#Specifies a path to native header files.
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}
+                    ${ANDROID_NDK}/sources/android/native_app_glue/ )
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
@@ -38,6 +53,8 @@ find_library( # Sets the name of the path variable.
 
 target_link_libraries( # Specifies the target library.
                        native-lib
+                       app-glue
+                       android
 
                        # Links the target library to the log library
                        # included in the NDK.

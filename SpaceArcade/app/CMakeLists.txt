@@ -30,6 +30,10 @@ add_library( # Sets the name of the library.
              # Provides a relative path to your source file(s).
              src/main/cpp/main.cpp )
 
+add_library( vulkan SHARED
+             src/main/cpp/vulkan_wrapper.cpp )
+
+
 #Specifies a path to native header files.
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}
                     ${ANDROID_NDK}/sources/android/native_app_glue/ )
@@ -55,7 +59,7 @@ target_link_libraries( # Specifies the target library.
                        native-lib
                        app-glue
                        android
-
+                       vulkan
                        # Links the target library to the log library
                        # included in the NDK.
                        ${log-lib} )

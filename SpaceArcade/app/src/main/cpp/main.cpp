@@ -1,6 +1,10 @@
-// Main.cpp
+// main.cpp
 #include <android_native_app_glue.h>
 #include <android/log.h>
+//#include <cassert>
+//#include <vector>
+//#include "vulkan_wrapper.h"
+
 ////////////////////////////////////////////////////////////////////////////////
 // The main entry into the game. 2018.03.19 DK
 void android_main(

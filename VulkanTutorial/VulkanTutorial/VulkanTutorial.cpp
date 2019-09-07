@@ -17,11 +17,15 @@ void printStats(VkPhysicalDevice& device) {
 
 	std::cout << "Name: " << properties.deviceName << std::endl;
 	uint32_t apiVer = properties.apiVersion;
-	std::cout << "API version: " << VK_VERSION_MAJOR(apiVer) << "." << VK_VERSION_MINOR(apiVer) << "." << VK_VERSION_PATCH(apiVer) << std::endl;
-	std::cout << "Driver Version: " << properties.driverVersion << std::endl;
-	std::cout << "Vendor ID: " << properties.vendorID << std::endl;
-	std::cout << "Device ID: " << properties.deviceID << std::endl;
-	std::cout << "Device Type: " << properties.deviceType << std::endl;
+	std::cout << "API version: " << "\t\t" << VK_VERSION_MAJOR(apiVer) << "." << VK_VERSION_MINOR(apiVer) << "." << VK_VERSION_PATCH(apiVer) << std::endl;
+	std::cout << "Driver Version: " << "\t" << properties.driverVersion << std::endl;
+	std::cout << "Vendor ID: " << "\t\t" << properties.vendorID << std::endl;
+	std::cout << "Device ID: " << "\t\t" << properties.deviceID << std::endl;
+	std::cout << "Device Type: " << "\t\t" << properties.deviceType << std::endl;
+
+	VkPhysicalDeviceFeatures features;
+	vkGetPhysicalDeviceFeatures(device, &features);
+	std::cout << "Geometry Shader: " << "\t" << features.geometryShader << std::endl;
 
 	std::cout << std::endl;
 }

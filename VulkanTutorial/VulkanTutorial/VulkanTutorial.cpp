@@ -34,9 +34,15 @@ int main()
 
 
 	VkResult result = vkCreateInstance(&instanceInfo, NULL, &instance);
-
 	ASSERT_VULKAN(result);
 
+	uint32_t amountOfPhysicalDevices = 0;
+	result = vkEnumeratePhysicalDevices(instance, &amountOfPhysicalDevices, NULL);
+	ASSERT_VULKAN(result);
+	
+	VkPhysicalDevice* physicalDevices = new VkPhysicalDevice[amountOfPhysicalDevices];
+	result = vkEnumeratePhysicalDevices(instance, &amountOfPhysicalDevices, physicalDevices);
+	ASSERT_VULKAN(result);
 
 	return 0;
 }

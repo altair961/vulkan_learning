@@ -4,6 +4,13 @@
 #include <iostream>
 #include "vulkan\vulkan.h"
 
+#define ASSERT_VULKAN(val)\
+		if(val != VK_SUCCESS) {\
+			__debugbreak();\
+		}
+
+VkInstance instance;
+
 int main()
 {
 	VkApplicationInfo appInfo;
@@ -24,6 +31,12 @@ int main()
 	instanceInfo.ppEnabledLayerNames = NULL;
 	instanceInfo.enabledExtensionCount = 0;
 	instanceInfo.ppEnabledExtensionNames = NULL;
+
+
+	VkResult result = vkCreateInstance(&instanceInfo, NULL, &instance);
+
+	ASSERT_VULKAN(result);
+
 
 	return 0;
 }

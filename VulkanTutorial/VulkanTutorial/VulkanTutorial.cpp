@@ -11,6 +11,21 @@
 
 VkInstance instance;
 
+void printStats(VkPhysicalDevice& device) {
+	VkPhysicalDeviceProperties properties;
+	vkGetPhysicalDeviceProperties(device, &properties);
+
+	std::cout << "Name: " << properties.deviceName << std::endl;
+	uint32_t apiVer = properties.apiVersion;
+	std::cout << "API version: " << VK_VERSION_MAJOR(apiVer) << "." << VK_VERSION_MINOR(apiVer) << "." << VK_VERSION_PATCH(apiVer) << std::endl;
+	std::cout << "Driver Version: " << properties.driverVersion << std::endl;
+	std::cout << "Vendor ID: " << properties.vendorID << std::endl;
+	std::cout << "Device ID: " << properties.deviceID << std::endl;
+	std::cout << "Device Type: " << properties.deviceType << std::endl;
+
+	std::cout << std::endl;
+}
+
 int main()
 {
 	VkApplicationInfo appInfo;
@@ -39,10 +54,15 @@ int main()
 	uint32_t amountOfPhysicalDevices = 0;
 	result = vkEnumeratePhysicalDevices(instance, &amountOfPhysicalDevices, NULL);
 	ASSERT_VULKAN(result);
-	
+
 	VkPhysicalDevice* physicalDevices = new VkPhysicalDevice[amountOfPhysicalDevices];
 	result = vkEnumeratePhysicalDevices(instance, &amountOfPhysicalDevices, physicalDevices);
 	ASSERT_VULKAN(result);
+
+	for (uint32_t i = 0; i < amountOfPhysicalDevices; i++)
+	{
+		printStats(physicalDevices[i]);
+	}
 
 	return 0;
 }

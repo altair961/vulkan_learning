@@ -1,6 +1,11 @@
 #include <iostream>
 #include "vulkan/vulkan.h"
 
+#define ASSERT_VULKAN(val)\
+        if (val != VK_SUCCESS) {\
+            __debugbreak();\
+        }
+
 VkInstance instance;
 
 int main()
@@ -25,7 +30,9 @@ int main()
     instanceInfo.ppEnabledExtensionNames = NULL;
 
 
-    vkCreateInstance(&instanceInfo, NULL, &instance);
+    VkResult result = vkCreateInstance(&instanceInfo, NULL, &instance);
+
+    ASSERT_VULKAN(result);
 
     return 0;
 }

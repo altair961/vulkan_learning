@@ -34,5 +34,14 @@ int main()
 
     ASSERT_VULKAN(result);
 
+    uint32_t amountOfPhysicalDevices = 0;
+    vkEnumeratePhysicalDevices(instance, &amountOfPhysicalDevices, NULL); // when we pass NULL instead of array 
+    // with physical graphic cards the vkEnumeratePhysicalDevices function will write into amountOfPhysicalDevices
+    // a value with number of graphic cards installed into the computer
+
+    std::cout << amountOfPhysicalDevices;
+
+//    VkPhysicalDevice* physicalDevices = new VkPhysicalDevice[amountOfPhysicalDevices];
+
     return 0;
 }

@@ -8,6 +8,14 @@
 
 VkInstance instance;
 
+void printStats(VkPhysicalDevice &device) {
+    VkPhysicalDeviceProperties properties;
+    vkGetPhysicalDeviceProperties(device, &properties);
+
+    std::cout << "Name: " << properties.deviceName << std::endl;
+    std::cout << std::endl;
+}
+
 int main()
 {
     VkApplicationInfo appInfo;
@@ -35,13 +43,21 @@ int main()
     ASSERT_VULKAN(result);
 
     uint32_t amountOfPhysicalDevices = 0;
-    vkEnumeratePhysicalDevices(instance, &amountOfPhysicalDevices, NULL); // when we pass NULL instead of array 
-    // with physical graphic cards the vkEnumeratePhysicalDevices function will write into amountOfPhysicalDevices
-    // a value with number of graphic cards installed into the computer
+    vkEnumeratePhysicalDevices(instance, &amountOfPhysicalDevices, NULL); // when we pass NULL 
+    // instead of array with physical graphic cards the vkEnumeratePhysicalDevices 
+    // function will write into amountOfPhysicalDevices a value with number of graphic cards installed into the computer
 
-    std::cout << amountOfPhysicalDevices;
+    VkPhysicalDevice *physicalDevices = new VkPhysicalDevice[amountOfPhysicalDevices]; // define
+    // an array of size equal to amountOfPhysicalDevices
 
-//    VkPhysicalDevice* physicalDevices = new VkPhysicalDevice[amountOfPhysicalDevices];
+    vkEnumeratePhysicalDevices(instance, &amountOfPhysicalDevices, physicalDevices); // when we call vkEnumeratePhysicalDevices the second time and we pass it
+    // physicalDevices array instead of NULL and amountOfPhysicalDevices the physicalDevices[] is
+    // populated with available physical graphic cards
+
+    for (int i = 0; i < amountOfPhysicalDevices; i++)
+    {
+        printStats(physicalDevices[i]);
+    }
 
     return 0;
 }

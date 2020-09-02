@@ -25,6 +25,9 @@ void printStats(VkPhysicalDevice &device) {
     vkGetPhysicalDeviceFeatures(device, &features);
     std::cout << "Geometry Shader: " << "\t" << features.geometryShader << std::endl;
 
+    VkPhysicalDeviceMemoryProperties memProp;
+    vkGetPhysicalDeviceMemoryProperties(device, &memProp);
+
     std::cout << std::endl;
 }
 

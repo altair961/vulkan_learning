@@ -26,9 +26,39 @@ void printStats(VkPhysicalDevice &device) {
     std::cout << "Geometry Shader: " << "\t" << features.geometryShader << std::endl;
 
     VkPhysicalDeviceMemoryProperties memProp;
-    vkGetPhysicalDeviceMemoryProperties(device, &memProp);
+    vkGetPhysicalDeviceMemoryProperties(device, &memProp); // &memProp means "to take address of memProp variable"
+
+    uint32_t amountOfQueueFamilies = 0;
+    vkGetPhysicalDeviceQueueFamilyProperties(device, &amountOfQueueFamilies, NULL); // when we pass NULL 
+    // instead of array with queue family properties the vkGetPhysicalDeviceQueueFamilyProperties
+    // function will write into amountOfQueueFamilies a value with number of queue family properties available in the graphics card
+    
+    VkQueueFamilyProperties *familyProperties = new VkQueueFamilyProperties[amountOfQueueFamilies]; // new operator returns address of memory and we store it into so called pointer that is *someName
+    vkGetPhysicalDeviceQueueFamilyProperties(device, &amountOfQueueFamilies, familyProperties); // here we put familyProperties without &, because it is a pointer - it is already an address of memory where object is located
+    // when we call vkGetPhysicalDeviceQueueFamilyProperties the second time and we pass it
+    // familyProperties array instead of NULL and amountOfQueueFamilies the familyProperties[] is
+    // populated with available queue family properties available in the graphics card
+
+    std::cout << "Amount of queue families: " << amountOfQueueFamilies << std::endl;
+    for (int i = 0; i < amountOfQueueFamilies; i++)
+    {
+        std::cout << std::endl;
+        std::cout << "Queue Family #" << i << std::endl;
+        std::cout << "VK_QUEUE_GRAPHICS_BIT       " << ((familyProperties[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) != 0) << std::endl;
+        std::cout << "VK_QUEUE_COMPUTE_BIT        " << ((familyProperties[i].queueFlags & VK_QUEUE_COMPUTE_BIT) != 0) << std::endl;
+        std::cout << "VK_QUEUE_TRANSFER_BIT       " << ((familyProperties[i].queueFlags & VK_QUEUE_TRANSFER_BIT) != 0) << std::endl;
+        std::cout << "VK_QUEUE_SPARSE_BINDING_BIT " << ((familyProperties[i].queueFlags & VK_QUEUE_SPARSE_BINDING_BIT) != 0) << std::endl;
+        std::cout << "Queue Count: " << familyProperties[i].queueCount << std::endl;
+        std::cout << "Timestamp Valid Bits: " << familyProperties[i].timestampValidBits << std::endl;
+        uint32_t width = familyProperties[i].minImageTransferGranularity.width;
+        uint32_t height = familyProperties[i].minImageTransferGranularity.height;
+        uint32_t depth = familyProperties[i].minImageTransferGranularity.depth;
+        std::cout << "Min Image Timestamp Granularity: " << width << ", " << height << ", " << depth << std::endl;
+    }
 
     std::cout << std::endl;
+
+    delete[] familyProperties;
 }
 
 int main()

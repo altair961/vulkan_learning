@@ -91,6 +91,23 @@ int main()
     }
     std::cout << std::endl;
 
+    uint32_t amountOfExtensions = 0; // Extensions are not nice to haves. Theay are essential part of Vulkan. Since it is crossplatform it must have some platform specific functionalities. E.g. some pieces of functionality related to window drawing. They are essential but differ for each platform.
+    vkEnumerateInstanceExtensionProperties(NULL, &amountOfExtensions, NULL);
+    VkExtensionProperties *extensions = new VkExtensionProperties[amountOfExtensions];
+    vkEnumerateInstanceExtensionProperties(NULL, &amountOfExtensions, extensions);
+
+    std::cout << std::endl;
+
+    std::cout << "Amount of Extensions: " << amountOfExtensions << std::endl;
+    for (int i = 0; i < amountOfExtensions; i++)
+    {
+        std::cout << std::endl;
+        std::cout << "Name of extension: " << extensions[i].extensionName << std::endl;
+        std::cout << "Spec Version: " << extensions[i].specVersion << std::endl;
+    }
+
+    std::cout << std::endl;
+
     //Normaly we should check if the validation layer is presented in the graphics card. But this layer is presented in every graphics card, so we do not check.
     const std::vector<const char*> validationLayers = { //set of c-strings
         "VK_LAYER_LUNARG_standard_validation"

@@ -7,6 +7,7 @@
         }
 
 VkInstance instance;
+VkDevice device;
 
 void printStats(VkPhysicalDevice &device) {
     VkPhysicalDeviceProperties properties;
@@ -127,6 +128,10 @@ int main()
     deviceCreateInfo.enabledExtensionCount = 0;
     deviceCreateInfo.ppEnabledExtensionNames = NULL;
     deviceCreateInfo.pEnabledFeatures = &usedFeatures;
+
+    //pick "best suitable physical device" here instead of just taking the first one
+    result = vkCreateDevice(physicalDevices[0], &deviceCreateInfo, NULL, &device);
+    ASSERT_VULKAN(result);
 
     return 0;
 }

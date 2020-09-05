@@ -113,5 +113,20 @@ int main()
     deviceQueueCreateInfo.queueCount = 1; // Here, instead of hardcoding 1 we need to find out the valid value.
     deviceQueueCreateInfo.pQueuePriorities = NULL;
 
+    VkPhysicalDeviceFeatures usedFeatures = {};
+
+    VkDeviceCreateInfo deviceCreateInfo;
+
+    deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    deviceCreateInfo.pNext = NULL;
+    deviceCreateInfo.flags = 0;
+    deviceCreateInfo.queueCreateInfoCount = 1;
+    deviceCreateInfo.pQueueCreateInfos = &deviceQueueCreateInfo;
+    deviceCreateInfo.enabledLayerCount = 0;
+    deviceCreateInfo.ppEnabledLayerNames = NULL;
+    deviceCreateInfo.enabledExtensionCount = 0;
+    deviceCreateInfo.ppEnabledExtensionNames = NULL;
+    deviceCreateInfo.pEnabledFeatures = &usedFeatures;
+
     return 0;
 }

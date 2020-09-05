@@ -1,5 +1,6 @@
 #include <iostream>
 #include "vulkan/vulkan.h"
+#include <vector>
 
 #define ASSERT_VULKAN(val)\
         if (val != VK_SUCCESS) {\
@@ -74,13 +75,34 @@ int main()
     appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
     appInfo.apiVersion = VK_API_VERSION_1_1;
 
+    uint32_t amountOfLayers = 0;
+    vkEnumerateInstanceLayerProperties(&amountOfLayers, NULL);
+    VkLayerProperties* layers = new VkLayerProperties[amountOfLayers];
+    vkEnumerateInstanceLayerProperties(&amountOfLayers, layers);
+
+    std::cout << "Amount of Instance Layers: " << amountOfLayers << std::endl;
+    for (int i = 0; i < amountOfLayers; i++)
+    {
+        std::cout << std::endl;
+        std::cout << "Layers Name: " << layers[i].layerName << std::endl;
+        std::cout << "Specification Version: " <<layers[i].specVersion << std::endl;
+        std::cout << "Implementation Version: " <<layers[i].implementationVersion << std::endl;
+        std::cout << "Description: " <<layers[i].description << std::endl;
+    }
+    std::cout << std::endl;
+
+    //Normaly we should check if the validation layer is presented in the graphics card. But this layer is presented in every graphics card, so we do not check.
+    const std::vector<const char*> validationLayers = { //set of c-strings
+        "VK_LAYER_LUNARG_standard_validation"
+    };
+
     VkInstanceCreateInfo instanceInfo;
     instanceInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     instanceInfo.pNext = NULL;
     instanceInfo.flags = 0;
     instanceInfo.pApplicationInfo = &appInfo;
-    instanceInfo.enabledLayerCount = 0;
-    instanceInfo.ppEnabledLayerNames = NULL;
+    instanceInfo.enabledLayerCount = validationLayers.size();
+    instanceInfo.ppEnabledLayerNames = validationLayers.data();
     instanceInfo.enabledExtensionCount = 0;
     instanceInfo.ppEnabledExtensionNames = NULL;
 

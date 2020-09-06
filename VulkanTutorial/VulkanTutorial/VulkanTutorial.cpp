@@ -184,6 +184,9 @@ int main()
     result = vkCreateDevice(physicalDevices[0], &deviceCreateInfo, nullptr, &device); // we do not use our own allocator so we pass in nullptr
     ASSERT_VULKAN(result);
 
+    VkQueue queue;
+    vkGetDeviceQueue(device, 0, 0, &queue);
+
     vkDeviceWaitIdle(device); //when this function returns we can be sure, that all work of this device is ended. Everything is gone from this device. We need ofcourse make sure we do not give new tasks to this device again
     
     // freeing up resources should happen in reverse sequence from the sequence of creating. E.g.: First we created instance, second - device, so we have to delete first device and then instance

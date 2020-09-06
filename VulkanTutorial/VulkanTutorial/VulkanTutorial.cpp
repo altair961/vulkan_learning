@@ -76,9 +76,12 @@ int main()
     appInfo.apiVersion = VK_API_VERSION_1_1;
 
     uint32_t amountOfLayers = 0;
-    vkEnumerateInstanceLayerProperties(&amountOfLayers, NULL);
+    VkResult result = vkEnumerateInstanceLayerProperties(&amountOfLayers, NULL);
+    ASSERT_VULKAN(result);
+
     VkLayerProperties* layers = new VkLayerProperties[amountOfLayers];
-    vkEnumerateInstanceLayerProperties(&amountOfLayers, layers);
+    result = vkEnumerateInstanceLayerProperties(&amountOfLayers, layers);
+    ASSERT_VULKAN(result);
 
     std::cout << "Amount of Instance Layers: " << amountOfLayers << std::endl;
     for (int i = 0; i < amountOfLayers; i++)
@@ -92,9 +95,12 @@ int main()
     std::cout << std::endl;
 
     uint32_t amountOfExtensions = 0; // Extensions are not nice to haves. Theay are essential part of Vulkan. Since it is crossplatform it must have some platform specific functionalities. E.g. some pieces of functionality related to window drawing. They are essential but differ for each platform.
-    vkEnumerateInstanceExtensionProperties(NULL, &amountOfExtensions, NULL);
+    result = vkEnumerateInstanceExtensionProperties(NULL, &amountOfExtensions, NULL);
+    ASSERT_VULKAN(result);
+
     VkExtensionProperties *extensions = new VkExtensionProperties[amountOfExtensions];
-    vkEnumerateInstanceExtensionProperties(NULL, &amountOfExtensions, extensions);
+    result = vkEnumerateInstanceExtensionProperties(NULL, &amountOfExtensions, extensions);
+    ASSERT_VULKAN(result);
 
     std::cout << std::endl;
 
@@ -124,19 +130,20 @@ int main()
     instanceInfo.ppEnabledExtensionNames = NULL;
 
 
-    VkResult result = vkCreateInstance(&instanceInfo, NULL, &instance);
-
+    result = vkCreateInstance(&instanceInfo, NULL, &instance);
     ASSERT_VULKAN(result);
 
     uint32_t amountOfPhysicalDevices = 0;
-    vkEnumeratePhysicalDevices(instance, &amountOfPhysicalDevices, NULL); // when we pass NULL 
+    result = vkEnumeratePhysicalDevices(instance, &amountOfPhysicalDevices, NULL); // when we pass NULL 
+    ASSERT_VULKAN(result);
+
     // instead of array with physical graphic cards the vkEnumeratePhysicalDevices 
     // function will write into amountOfPhysicalDevices a value with number of graphic cards installed into the computer
 
-    VkPhysicalDevice *physicalDevices = new VkPhysicalDevice[amountOfPhysicalDevices]; // define
-    // an array of size equal to amountOfPhysicalDevices
+    VkPhysicalDevice *physicalDevices = new VkPhysicalDevice[amountOfPhysicalDevices]; // define an array of size equal to amountOfPhysicalDevices
 
-    vkEnumeratePhysicalDevices(instance, &amountOfPhysicalDevices, physicalDevices); // when we call vkEnumeratePhysicalDevices the second time and we pass it
+    result = vkEnumeratePhysicalDevices(instance, &amountOfPhysicalDevices, physicalDevices); // when we call vkEnumeratePhysicalDevices the second time and we pass it
+    ASSERT_VULKAN(result);
     // physicalDevices array instead of NULL and amountOfPhysicalDevices the physicalDevices[] is
     // populated with available physical graphic cards
 
@@ -171,8 +178,18 @@ int main()
     deviceCreateInfo.pEnabledFeatures = &usedFeatures;
 
     //pick "best suitable physical device" here instead of just taking the first one
-    result = vkCreateDevice(physicalDevices[0], &deviceCreateInfo, NULL, &device);
+    result = vkCreateDevice(physicalDevices[0], &deviceCreateInfo, NULL, &device); // we do not use our own allocator so we pass in NULL
     ASSERT_VULKAN(result);
+
+    vkDeviceWaitIdle(device); //when this function returns we can be sure, that all work of this device is ended. Everything is gone from this device. We need ofcourse make sure we do not give new tasks to this device again
+    
+    // freeing up resources should happen in reverse sequence from the sequence of creating. E.g.: First we created instance, second - device, so we have to delete first device and then instance
+    vkDestroyDevice(device, NULL); // we didn't use our own allocator so we place here NULL
+    vkDestroyInstance(instance, NULL); // when we destroy instance all the physical devices are getting destroyed as well
+
+    delete[] layers;
+    delete[] extensions;
+    delete[] physicalDevices;
 
     return 0;
 }

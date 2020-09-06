@@ -32,14 +32,14 @@ void printStats(VkPhysicalDevice &device) {
     vkGetPhysicalDeviceMemoryProperties(device, &memProp); // &memProp means "to take address of memProp variable"
 
     uint32_t amountOfQueueFamilies = 0;
-    vkGetPhysicalDeviceQueueFamilyProperties(device, &amountOfQueueFamilies, NULL); // when we pass NULL 
+    vkGetPhysicalDeviceQueueFamilyProperties(device, &amountOfQueueFamilies, nullptr); // when we pass nullptr 
     // instead of array with queue family properties the vkGetPhysicalDeviceQueueFamilyProperties
     // function will write into amountOfQueueFamilies a value with number of queue family properties available in the graphics card
     
     VkQueueFamilyProperties *familyProperties = new VkQueueFamilyProperties[amountOfQueueFamilies]; // new operator returns address of memory and we store it into so called pointer that is *someName
     vkGetPhysicalDeviceQueueFamilyProperties(device, &amountOfQueueFamilies, familyProperties); // here we put familyProperties without &, because it is a pointer - it is already an address of memory where object is located
     // when we call vkGetPhysicalDeviceQueueFamilyProperties the second time and we pass it
-    // familyProperties array instead of NULL and amountOfQueueFamilies the familyProperties[] is
+    // familyProperties array instead of nullptr and amountOfQueueFamilies the familyProperties[] is
     // populated with available queue family properties available in the graphics card
 
     std::cout << "Amount of queue families: " << "\t" << amountOfQueueFamilies << std::endl;
@@ -68,7 +68,7 @@ int main()
 {
     VkApplicationInfo appInfo;
     appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-    appInfo.pNext = NULL;
+    appInfo.pNext = nullptr;
     appInfo.pApplicationName = "Vulkan Tutorial";
     appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
     appInfo.pEngineName = "Super Vulkan Engine Turbo Mega";
@@ -76,7 +76,7 @@ int main()
     appInfo.apiVersion = VK_API_VERSION_1_1;
 
     uint32_t amountOfLayers = 0;
-    VkResult result = vkEnumerateInstanceLayerProperties(&amountOfLayers, NULL);
+    VkResult result = vkEnumerateInstanceLayerProperties(&amountOfLayers, nullptr);
     ASSERT_VULKAN(result);
 
     VkLayerProperties* layers = new VkLayerProperties[amountOfLayers];
@@ -95,11 +95,11 @@ int main()
     std::cout << std::endl;
 
     uint32_t amountOfExtensions = 0; // Extensions are not nice to haves. Theay are essential part of Vulkan. Since it is crossplatform it must have some platform specific functionalities. E.g. some pieces of functionality related to window drawing. They are essential but differ for each platform.
-    result = vkEnumerateInstanceExtensionProperties(NULL, &amountOfExtensions, NULL);
+    result = vkEnumerateInstanceExtensionProperties(nullptr, &amountOfExtensions, nullptr);
     ASSERT_VULKAN(result);
 
     VkExtensionProperties *extensions = new VkExtensionProperties[amountOfExtensions];
-    result = vkEnumerateInstanceExtensionProperties(NULL, &amountOfExtensions, extensions);
+    result = vkEnumerateInstanceExtensionProperties(nullptr, &amountOfExtensions, extensions);
     ASSERT_VULKAN(result);
 
     std::cout << std::endl;
@@ -121,20 +121,20 @@ int main()
 
     VkInstanceCreateInfo instanceInfo;
     instanceInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-    instanceInfo.pNext = NULL;
+    instanceInfo.pNext = nullptr;
     instanceInfo.flags = 0;
     instanceInfo.pApplicationInfo = &appInfo;
     instanceInfo.enabledLayerCount = validationLayers.size();
     instanceInfo.ppEnabledLayerNames = validationLayers.data();
     instanceInfo.enabledExtensionCount = 0;
-    instanceInfo.ppEnabledExtensionNames = NULL;
+    instanceInfo.ppEnabledExtensionNames = nullptr;
 
 
-    result = vkCreateInstance(&instanceInfo, NULL, &instance);
+    result = vkCreateInstance(&instanceInfo, nullptr, &instance);
     ASSERT_VULKAN(result);
 
     uint32_t amountOfPhysicalDevices = 0;
-    result = vkEnumeratePhysicalDevices(instance, &amountOfPhysicalDevices, NULL); // when we pass NULL 
+    result = vkEnumeratePhysicalDevices(instance, &amountOfPhysicalDevices, nullptr); // when we pass nullptr 
     ASSERT_VULKAN(result);
 
     // instead of array with physical graphic cards the vkEnumeratePhysicalDevices 
@@ -147,7 +147,7 @@ int main()
 
     result = vkEnumeratePhysicalDevices(instance, &amountOfPhysicalDevices, physicalDevices.data()); // when we call vkEnumeratePhysicalDevices the second time and we pass it
     ASSERT_VULKAN(result);
-    // physicalDevices array instead of NULL and amountOfPhysicalDevices the physicalDevices[] is
+    // physicalDevices array instead of nullptr and amountOfPhysicalDevices the physicalDevices[] is
     // populated with available physical graphic cards
 
     for (int i = 0; i < amountOfPhysicalDevices; i++)
@@ -159,7 +159,7 @@ int main()
 
     VkDeviceQueueCreateInfo deviceQueueCreateInfo;
     deviceQueueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-    deviceQueueCreateInfo.pNext = NULL;
+    deviceQueueCreateInfo.pNext = nullptr;
     deviceQueueCreateInfo.flags = 0;
     deviceQueueCreateInfo.queueFamilyIndex = 0; // Here, instead of hard coding 0 we actually need to find out what index has queue family that we are interested in. VkQueueFamilyProperties[amountOfQueueFamilies] contains all queue families.
     deviceQueueCreateInfo.queueCount = 1; // Here, instead of hardcoding 1 we need to find out the valid value.
@@ -170,25 +170,25 @@ int main()
     VkDeviceCreateInfo deviceCreateInfo;
 
     deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-    deviceCreateInfo.pNext = NULL;
+    deviceCreateInfo.pNext = nullptr;
     deviceCreateInfo.flags = 0;
     deviceCreateInfo.queueCreateInfoCount = 1;
     deviceCreateInfo.pQueueCreateInfos = &deviceQueueCreateInfo;
     deviceCreateInfo.enabledLayerCount = 0;
-    deviceCreateInfo.ppEnabledLayerNames = NULL;
+    deviceCreateInfo.ppEnabledLayerNames = nullptr;
     deviceCreateInfo.enabledExtensionCount = 0;
-    deviceCreateInfo.ppEnabledExtensionNames = NULL;
+    deviceCreateInfo.ppEnabledExtensionNames = nullptr;
     deviceCreateInfo.pEnabledFeatures = &usedFeatures;
 
     //pick "best suitable physical device" here instead of just taking the first one
-    result = vkCreateDevice(physicalDevices[0], &deviceCreateInfo, NULL, &device); // we do not use our own allocator so we pass in NULL
+    result = vkCreateDevice(physicalDevices[0], &deviceCreateInfo, nullptr, &device); // we do not use our own allocator so we pass in nullptr
     ASSERT_VULKAN(result);
 
     vkDeviceWaitIdle(device); //when this function returns we can be sure, that all work of this device is ended. Everything is gone from this device. We need ofcourse make sure we do not give new tasks to this device again
     
     // freeing up resources should happen in reverse sequence from the sequence of creating. E.g.: First we created instance, second - device, so we have to delete first device and then instance
-    vkDestroyDevice(device, NULL); // we didn't use our own allocator so we place here NULL
-    vkDestroyInstance(instance, NULL); // when we destroy instance all the physical devices are getting destroyed as well
+    vkDestroyDevice(device, nullptr); // we didn't use our own allocator so we place here nullptr
+    vkDestroyInstance(instance, nullptr); // when we destroy instance all the physical devices are getting destroyed as well
 
     delete[] layers;
     delete[] extensions;

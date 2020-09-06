@@ -140,9 +140,12 @@ int main()
     // instead of array with physical graphic cards the vkEnumeratePhysicalDevices 
     // function will write into amountOfPhysicalDevices a value with number of graphic cards installed into the computer
 
-    VkPhysicalDevice *physicalDevices = new VkPhysicalDevice[amountOfPhysicalDevices]; // define an array of size equal to amountOfPhysicalDevices
+    // VkPhysicalDevice *physicalDevices = new VkPhysicalDevice[amountOfPhysicalDevices]; // define an array of size equal to amountOfPhysicalDevices
+    std::vector<VkPhysicalDevice> physicalDevices;
+    // vector does not have the size it is created with in the C++ standard, so we have to resize it to the value that we need
+    physicalDevices.resize(amountOfPhysicalDevices);
 
-    result = vkEnumeratePhysicalDevices(instance, &amountOfPhysicalDevices, physicalDevices); // when we call vkEnumeratePhysicalDevices the second time and we pass it
+    result = vkEnumeratePhysicalDevices(instance, &amountOfPhysicalDevices, physicalDevices.data()); // when we call vkEnumeratePhysicalDevices the second time and we pass it
     ASSERT_VULKAN(result);
     // physicalDevices array instead of NULL and amountOfPhysicalDevices the physicalDevices[] is
     // populated with available physical graphic cards
@@ -189,7 +192,8 @@ int main()
 
     delete[] layers;
     delete[] extensions;
-    delete[] physicalDevices;
+    // we do not delete physicalDevices vector because it is stored in the stack memory so when the execution goes beyond the curly braces the memory is freed up automatically
+    // delete[] physicalDevices; 
 
     return 0;
 }

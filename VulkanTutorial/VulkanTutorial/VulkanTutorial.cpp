@@ -1,6 +1,7 @@
-#include <iostream>
+#define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
 #include <vector>
+#include <iostream>
 
 #define ASSERT_VULKAN(val)\
         if (val != VK_SUCCESS) {\
@@ -10,7 +11,7 @@
 VkInstance instance;
 VkDevice device;
 
-void printStats(VkPhysicalDevice &device) {
+void printStats(VkPhysicalDevice& device) {
     VkPhysicalDeviceProperties properties;
     vkGetPhysicalDeviceProperties(device, &properties);
 
@@ -35,8 +36,8 @@ void printStats(VkPhysicalDevice &device) {
     vkGetPhysicalDeviceQueueFamilyProperties(device, &amountOfQueueFamilies, nullptr); // when we pass nullptr 
     // instead of array with queue family properties the vkGetPhysicalDeviceQueueFamilyProperties
     // function will write into amountOfQueueFamilies a value with number of queue family properties available in the graphics card
-    
-    VkQueueFamilyProperties *familyProperties = new VkQueueFamilyProperties[amountOfQueueFamilies]; // new operator returns address of memory and we store it into so called pointer that is *someName
+
+    VkQueueFamilyProperties* familyProperties = new VkQueueFamilyProperties[amountOfQueueFamilies]; // new operator returns address of memory and we store it into so called pointer that is *someName
     vkGetPhysicalDeviceQueueFamilyProperties(device, &amountOfQueueFamilies, familyProperties); // here we put familyProperties without &, because it is a pointer - it is already an address of memory where object is located
     // when we call vkGetPhysicalDeviceQueueFamilyProperties the second time and we pass it
     // familyProperties array instead of nullptr and amountOfQueueFamilies the familyProperties[] is
@@ -88,9 +89,9 @@ int main()
     {
         std::cout << std::endl;
         std::cout << "Layers Name: " << layers[i].layerName << std::endl;
-        std::cout << "Specification Version: " <<layers[i].specVersion << std::endl;
-        std::cout << "Implementation Version: " <<layers[i].implementationVersion << std::endl;
-        std::cout << "Description: " <<layers[i].description << std::endl;
+        std::cout << "Specification Version: " << layers[i].specVersion << std::endl;
+        std::cout << "Implementation Version: " << layers[i].implementationVersion << std::endl;
+        std::cout << "Description: " << layers[i].description << std::endl;
     }
     std::cout << std::endl;
 
@@ -98,7 +99,7 @@ int main()
     result = vkEnumerateInstanceExtensionProperties(nullptr, &amountOfExtensions, nullptr);
     ASSERT_VULKAN(result);
 
-    VkExtensionProperties *extensions = new VkExtensionProperties[amountOfExtensions];
+    VkExtensionProperties* extensions = new VkExtensionProperties[amountOfExtensions];
     result = vkEnumerateInstanceExtensionProperties(nullptr, &amountOfExtensions, extensions);
     ASSERT_VULKAN(result);
 
@@ -119,6 +120,11 @@ int main()
         "VK_LAYER_LUNARG_standard_validation"
     };
 
+    const std::vector<const char*> usedExtensions = {
+        "VK_KHR_win32_surface",
+        VK_KHR_WIN32_SURFACE_EXTENSION_NAME
+    };
+
     VkInstanceCreateInfo instanceInfo;
     instanceInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     instanceInfo.pNext = nullptr;
@@ -126,11 +132,21 @@ int main()
     instanceInfo.pApplicationInfo = &appInfo;
     instanceInfo.enabledLayerCount = validationLayers.size();
     instanceInfo.ppEnabledLayerNames = validationLayers.data();
-    instanceInfo.enabledExtensionCount = 0;
-    instanceInfo.ppEnabledExtensionNames = nullptr;
-
+    instanceInfo.enabledExtensionCount = usedExtensions.size();
+    instanceInfo.ppEnabledExtensionNames = usedExtensions.data();
 
     result = vkCreateInstance(&instanceInfo, nullptr, &instance);
+    ASSERT_VULKAN(result);
+
+    VkWin32SurfaceCreateInfoKHR surfaceCreateInfo;
+    surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_DISPLAY_SURFACE_CREATE_INFO_KHR;
+    surfaceCreateInfo.pNext = nullptr;
+    surfaceCreateInfo.flags = 0;
+    surfaceCreateInfo.hinstance = nullptr;
+    surfaceCreateInfo.hwnd = nullptr;
+
+    VkSurfaceKHR surface;
+    result = vkCreateWin32SurfaceKHR(instance, &surfaceCreateInfo, nullptr, &surface);
     ASSERT_VULKAN(result);
 
     uint32_t amountOfPhysicalDevices = 0;
@@ -155,7 +171,7 @@ int main()
         printStats(physicalDevices[i]);
     }
 
-    float queuePrios[] = {1.0f, 1.0f, 1.0f, 1.0f };
+    float queuePrios[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
     VkDeviceQueueCreateInfo deviceQueueCreateInfo;
     deviceQueueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -188,9 +204,10 @@ int main()
     vkGetDeviceQueue(device, 0, 0, &queue);
 
     vkDeviceWaitIdle(device); //when this function returns we can be sure, that all work of this device is ended. Everything is gone from this device. We need ofcourse make sure we do not give new tasks to this device again
-    
+
     // freeing up resources should happen in reverse sequence from the sequence of creating. E.g.: First we created instance, second - device, so we have to delete first device and then instance
     vkDestroyDevice(device, nullptr); // we didn't use our own allocator so we place here nullptr
+    vkDestroySurfaceKHR(instance, surface, nullptr);
     vkDestroyInstance(instance, nullptr); // when we destroy instance all the physical devices are getting destroyed as well
 
     delete[] layers;

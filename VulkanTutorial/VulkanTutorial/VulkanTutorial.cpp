@@ -1,5 +1,7 @@
 #define VK_USE_PLATFORM_WIN32_KHR
-#include "vulkan/vulkan.h"
+#define GLFW_INCLUDE_VULKAN // here we explicitly say that we want to work with Vulkan instead of default OpenGL
+#include <GLFW\glfw3.h>
+//#include "vulkan/vulkan.h" we do not need it as we can access Vulkan through GLFW
 #include <vector>
 #include <iostream>
 
@@ -10,6 +12,7 @@
 
 VkInstance instance;
 VkDevice device;
+GLFWwindow* window;
 
 void printStats(VkPhysicalDevice& device) {
     VkPhysicalDeviceProperties properties;
@@ -65,8 +68,15 @@ void printStats(VkPhysicalDevice& device) {
     delete[] familyProperties;
 }
 
-int main()
-{
+void startGlfw() {
+    glfwInit();
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API); // here we say, that we do not want to use OpenGL
+    glfwWindowHint(GLFW_RESIZABLE, FALSE);
+
+    window = glfwCreateWindow(400, 300, "Vulkan Tutorial", nullptr, nullptr);
+}
+
+void startVulkan() {
     VkApplicationInfo appInfo;
     appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     appInfo.pNext = nullptr;
@@ -203,17 +213,38 @@ int main()
     VkQueue queue;
     vkGetDeviceQueue(device, 0, 0, &queue);
 
-    vkDeviceWaitIdle(device); //when this function returns we can be sure, that all work of this device is ended. Everything is gone from this device. We need ofcourse make sure we do not give new tasks to this device again
-
-    // freeing up resources should happen in reverse sequence from the sequence of creating. E.g.: First we created instance, second - device, so we have to delete first device and then instance
-    vkDestroyDevice(device, nullptr); // we didn't use our own allocator so we place here nullptr
-    vkDestroySurfaceKHR(instance, surface, nullptr);
-    vkDestroyInstance(instance, nullptr); // when we destroy instance all the physical devices are getting destroyed as well
-
     delete[] layers;
     delete[] extensions;
     // we do not delete physicalDevices vector because it is stored in the stack memory so when the execution goes beyond the curly braces the memory is freed up automatically
     // delete[] physicalDevices; 
+}
+
+void gameLoop() {
+    while (!glfwWindowShouldClose(window)) {
+        glfwPollEvents();
+    }
+}
+
+void shutdownVulkan() {
+    vkDeviceWaitIdle(device); //when this function returns we can be sure, that all work of this device is ended. Everything is gone from this device. We need ofcourse make sure we do not give new tasks to this device again
+
+// freeing up resources should happen in reverse sequence from the sequence of creating. E.g.: First we created instance, second - device, so we have to delete first device and then instance
+    vkDestroyDevice(device, nullptr); // we didn't use our own allocator so we place here nullptr
+//    vkDestroySurfaceKHR(instance, surface, nullptr);
+    vkDestroyInstance(instance, nullptr); // when we destroy instance all the physical devices are getting destroyed as well
+}
+
+void shutdownGlfw() {
+    glfwDestroyWindow(window);
+}
+
+int main()
+{
+    startGlfw();
+    startVulkan();
+    gameLoop();
+    shutdownVulkan();
+    shutdownGlfw();
 
     return 0;
 }

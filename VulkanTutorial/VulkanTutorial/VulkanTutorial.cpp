@@ -11,6 +11,7 @@
         }
 
 VkInstance instance;
+VkSurfaceKHR surface;
 VkDevice device;
 GLFWwindow* window;
 
@@ -135,6 +136,9 @@ void startVulkan() {
         VK_KHR_WIN32_SURFACE_EXTENSION_NAME
     };
 
+    uint32_t amountOfGlfwExtensions = 0;
+    auto glfwExtensions = glfwGetRequiredInstanceExtensions(&amountOfGlfwExtensions);
+
     VkInstanceCreateInfo instanceInfo;
     instanceInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     instanceInfo.pNext = nullptr;
@@ -142,8 +146,8 @@ void startVulkan() {
     instanceInfo.pApplicationInfo = &appInfo;
     instanceInfo.enabledLayerCount = validationLayers.size();
     instanceInfo.ppEnabledLayerNames = validationLayers.data();
-    instanceInfo.enabledExtensionCount = usedExtensions.size();
-    instanceInfo.ppEnabledExtensionNames = usedExtensions.data();
+    instanceInfo.enabledExtensionCount = amountOfGlfwExtensions;
+    instanceInfo.ppEnabledExtensionNames = glfwExtensions;
 
     result = vkCreateInstance(&instanceInfo, nullptr, &instance);
     ASSERT_VULKAN(result);
@@ -155,7 +159,9 @@ void startVulkan() {
     surfaceCreateInfo.hinstance = nullptr;
     surfaceCreateInfo.hwnd = nullptr;
 
-    VkSurfaceKHR surface;
+    result = glfwCreateWindowSurface(instance, window, nullptr, &surface);
+    ASSERT_VULKAN(result);
+
     result = vkCreateWin32SurfaceKHR(instance, &surfaceCreateInfo, nullptr, &surface);
     ASSERT_VULKAN(result);
 
@@ -230,7 +236,7 @@ void shutdownVulkan() {
 
 // freeing up resources should happen in reverse sequence from the sequence of creating. E.g.: First we created instance, second - device, so we have to delete first device and then instance
     vkDestroyDevice(device, nullptr); // we didn't use our own allocator so we place here nullptr
-//    vkDestroySurfaceKHR(instance, surface, nullptr);
+    vkDestroySurfaceKHR(instance, surface, nullptr);
     vkDestroyInstance(instance, nullptr); // when we destroy instance all the physical devices are getting destroyed as well
 }
 

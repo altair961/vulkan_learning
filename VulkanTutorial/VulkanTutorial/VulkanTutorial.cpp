@@ -77,9 +77,23 @@ void printStats(VkPhysicalDevice& device) {
     std::cout << "\tcurrentTransform: " << surfaceCapabilities.currentTransform << std::endl;
     std::cout << "\tsupportedCompositeAlpha: " << surfaceCapabilities.supportedCompositeAlpha << std::endl;
     std::cout << "\tsupportedUsageFlags: " << surfaceCapabilities.supportedUsageFlags << std::endl;
+
+    uint32_t amountOfFormats = 0;
+    vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &amountOfFormats, nullptr);
+    VkSurfaceFormatKHR* surfaceFormats = new VkSurfaceFormatKHR[amountOfFormats];
+    vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &amountOfFormats, surfaceFormats);
+    
+    std::cout << std::endl;
+    std::cout << "Amount of formats: " << amountOfFormats << std::endl;
+    for (int i = 0; i < amountOfFormats; i++)
+    {
+        std::cout << surfaceFormats[i].format << std::endl;
+    }
+
     std::cout << std::endl;
 
     delete[] familyProperties;
+    delete[] surfaceFormats;
 }
 
 void startGlfw() {

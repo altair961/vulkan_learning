@@ -299,6 +299,14 @@ void startVulkan() {
     result = vkCreateSwapchainKHR(device, &swapchainCreateInfo, nullptr, &swapchain);
     ASSERT_VULKAN(result);
 
+    uint32_t amountOfImagesInSwapchain = 0;
+    vkGetSwapchainImagesKHR(device, swapchain, &amountOfImagesInSwapchain, nullptr);
+    VkImage* swapchainImages = new VkImage[amountOfImagesInSwapchain];
+    result = vkGetSwapchainImagesKHR(device, swapchain, &amountOfImagesInSwapchain, swapchainImages);
+    ASSERT_VULKAN(result);
+
+
+    delete[] swapchainImages;
     delete[] layers;
     delete[] extensions;
     // we do not delete physicalDevices vector because it is stored in the stack memory so when the execution goes beyond the curly braces the memory is freed up automatically

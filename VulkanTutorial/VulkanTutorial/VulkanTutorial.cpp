@@ -13,6 +13,7 @@
 VkInstance instance;
 VkSurfaceKHR surface;
 VkDevice device;
+VkSwapchainKHR swapchain;
 GLFWwindow* window;
 
 const uint32_t WIDTH = 400;
@@ -105,27 +106,6 @@ void printStats(VkPhysicalDevice& device) {
     {
         std::cout << "Supported presentation mode: " << presentModes[i] << std::endl;
     }
-
-    VkSwapchainCreateInfoKHR swapchainCreateInfo;
-
-    swapchainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-    swapchainCreateInfo.pNext = nullptr;
-    swapchainCreateInfo.flags = 0;
-    swapchainCreateInfo.surface = surface;
-    swapchainCreateInfo.minImageCount = 3; // TODO: civ
-    swapchainCreateInfo.imageFormat = VK_FORMAT_B8G8R8A8_UNORM; // TODO: civ
-    swapchainCreateInfo.imageColorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR; // TODO: civ
-    swapchainCreateInfo.imageExtent = VkExtent2D{ WIDTH, HEIGHT };
-    swapchainCreateInfo.imageArrayLayers = 1;
-    swapchainCreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-    swapchainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE; // TODO: civ
-    swapchainCreateInfo.queueFamilyIndexCount = 0;
-    swapchainCreateInfo.pQueueFamilyIndices = nullptr;
-    swapchainCreateInfo.preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
-    swapchainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-    swapchainCreateInfo.presentMode = VK_PRESENT_MODE_FIFO_KHR; // TODO: civ
-    swapchainCreateInfo.clipped = VK_TRUE;
-    swapchainCreateInfo.oldSwapchain = VK_NULL_HANDLE;
 
     std::cout << std::endl;
     delete[] familyProperties;
@@ -262,6 +242,9 @@ void startVulkan() {
     deviceQueueCreateInfo.pQueuePriorities = queuePrios;
 
     VkPhysicalDeviceFeatures usedFeatures = {};
+    const std::vector<const char*> deviceExtensions = {
+        VK_KHR_SWAPCHAIN_EXTENSION_NAME
+    };
 
     VkDeviceCreateInfo deviceCreateInfo;
 
@@ -272,8 +255,8 @@ void startVulkan() {
     deviceCreateInfo.pQueueCreateInfos = &deviceQueueCreateInfo;
     deviceCreateInfo.enabledLayerCount = 0;
     deviceCreateInfo.ppEnabledLayerNames = nullptr;
-    deviceCreateInfo.enabledExtensionCount = 0;
-    deviceCreateInfo.ppEnabledExtensionNames = nullptr;
+    deviceCreateInfo.enabledExtensionCount = deviceExtensions.size();
+    deviceCreateInfo.ppEnabledExtensionNames = deviceExtensions.data();
     deviceCreateInfo.pEnabledFeatures = &usedFeatures;
 
     //pick "best suitable physical device" here instead of just taking the first one
@@ -282,6 +265,39 @@ void startVulkan() {
 
     VkQueue queue;
     vkGetDeviceQueue(device, 0, 0, &queue);
+
+
+    VkBool32 surfaceSupport = false;
+    result = vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevices[0], 0, surface, &surfaceSupport);
+    ASSERT_VULKAN(result);
+
+    if (!surfaceSupport) {
+        std::cerr << "Surface not supported!" << std::endl;
+        __debugbreak();
+    }
+
+    VkSwapchainCreateInfoKHR swapchainCreateInfo;
+    swapchainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+    swapchainCreateInfo.pNext = nullptr;
+    swapchainCreateInfo.flags = 0;
+    swapchainCreateInfo.surface = surface;
+    swapchainCreateInfo.minImageCount = 3; // TODO: civ
+    swapchainCreateInfo.imageFormat = VK_FORMAT_B8G8R8A8_UNORM; // TODO: civ
+    swapchainCreateInfo.imageColorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR; // TODO: civ
+    swapchainCreateInfo.imageExtent = VkExtent2D{ WIDTH, HEIGHT };
+    swapchainCreateInfo.imageArrayLayers = 1;
+    swapchainCreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+    swapchainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE; // TODO: civ
+    swapchainCreateInfo.queueFamilyIndexCount = 0;
+    swapchainCreateInfo.pQueueFamilyIndices = nullptr;
+    swapchainCreateInfo.preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
+    swapchainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+    swapchainCreateInfo.presentMode = VK_PRESENT_MODE_FIFO_KHR; // TODO: civ
+    swapchainCreateInfo.clipped = VK_TRUE;
+    swapchainCreateInfo.oldSwapchain = VK_NULL_HANDLE;
+
+    result = vkCreateSwapchainKHR(device, &swapchainCreateInfo, nullptr, &swapchain);
+    ASSERT_VULKAN(result);
 
     delete[] layers;
     delete[] extensions;
@@ -298,7 +314,8 @@ void gameLoop() {
 void shutdownVulkan() {
     vkDeviceWaitIdle(device); //when this function returns we can be sure, that all work of this device is ended. Everything is gone from this device. We need ofcourse make sure we do not give new tasks to this device again
 
-// freeing up resources should happen in reverse sequence from the sequence of creating. E.g.: First we created instance, second - device, so we have to delete first device and then instance
+    // freeing up resources should happen in reverse sequence from the sequence of creating. E.g.: First we created instance, second - device, so we have to delete first device and then instance
+    vkDestroySwapchainKHR(device, swapchain, nullptr);
     vkDestroyDevice(device, nullptr); // we didn't use our own allocator so we place here nullptr
     vkDestroySurfaceKHR(instance, surface, nullptr);
     vkDestroyInstance(instance, nullptr); // when we destroy instance all the physical devices are getting destroyed as well

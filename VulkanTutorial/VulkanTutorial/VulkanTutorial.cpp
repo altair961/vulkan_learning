@@ -15,6 +15,10 @@ VkSurfaceKHR surface;
 VkDevice device;
 GLFWwindow* window;
 
+const uint32_t WIDTH = 400;
+const uint32_t HEIGHT = 300;
+
+
 void printStats(VkPhysicalDevice& device) {
     VkPhysicalDeviceProperties properties;
     vkGetPhysicalDeviceProperties(device, &properties);
@@ -102,6 +106,27 @@ void printStats(VkPhysicalDevice& device) {
         std::cout << "Supported presentation mode: " << presentModes[i] << std::endl;
     }
 
+    VkSwapchainCreateInfoKHR swapchainCreateInfo;
+
+    swapchainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+    swapchainCreateInfo.pNext = nullptr;
+    swapchainCreateInfo.flags = 0;
+    swapchainCreateInfo.surface = surface;
+    swapchainCreateInfo.minImageCount = 3; // TODO: civ
+    swapchainCreateInfo.imageFormat = VK_FORMAT_B8G8R8A8_UNORM; // TODO: civ
+    swapchainCreateInfo.imageColorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR; // TODO: civ
+    swapchainCreateInfo.imageExtent = VkExtent2D{ WIDTH, HEIGHT };
+    swapchainCreateInfo.imageArrayLayers = 1;
+    swapchainCreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+    swapchainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE; // TODO: civ
+    swapchainCreateInfo.queueFamilyIndexCount = 0;
+    swapchainCreateInfo.pQueueFamilyIndices = nullptr;
+    swapchainCreateInfo.preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
+    swapchainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+    swapchainCreateInfo.presentMode = VK_PRESENT_MODE_FIFO_KHR; // TODO: civ
+    swapchainCreateInfo.clipped = VK_TRUE;
+    swapchainCreateInfo.oldSwapchain = VK_NULL_HANDLE;
+
     std::cout << std::endl;
     delete[] familyProperties;
     delete[] surfaceFormats;
@@ -113,7 +138,7 @@ void startGlfw() {
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API); // here we say, that we do not want to use OpenGL
     glfwWindowHint(GLFW_RESIZABLE, FALSE);
 
-    window = glfwCreateWindow(400, 300, "Vulkan Tutorial", nullptr, nullptr);
+    window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan Tutorial", nullptr, nullptr);
 }
 
 void startVulkan() {

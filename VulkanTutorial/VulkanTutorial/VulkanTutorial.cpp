@@ -348,8 +348,13 @@ void startVulkan() {
         ASSERT_VULKAN(result);
     }
        
+    // We have to read the compiled vertex and fragment shaders so we could use them from this code
     auto shaderCodeVert = readFile("vert.spv");
     auto shaderCodeFrag = readFile("frag.spv");
+
+    // the sizes of files must be the same as sizes reported by OS in file explorer. This way we additionally check out files for correctness.
+    //std::cout << shaderCodeVert.size() << std::endl; 
+    //std::cout << shaderCodeFrag.size() << std::endl; 
 
     delete[] swapchainImages;
     delete[] layers;

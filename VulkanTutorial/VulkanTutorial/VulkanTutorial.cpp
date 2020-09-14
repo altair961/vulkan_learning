@@ -4,6 +4,7 @@
 //#include "vulkan/vulkan.h" we do not need it as we can access Vulkan through GLFW
 #include <vector>
 #include <iostream>
+#include <fstream>
 
 #define ASSERT_VULKAN(val)\
         if (val != VK_SUCCESS) {\
@@ -113,6 +114,23 @@ void printStats(VkPhysicalDevice& device) {
     delete[] familyProperties;
     delete[] surfaceFormats;
     delete[] presentModes;
+}
+
+std::vector<char> readFile(const std::string &filename) {
+    std::ifstream file(filename, std::ios::binary | std::ios::ate);
+    
+    //ifstream returns boolean and we can open the file if it is true
+    if (file) {
+        size_t fileSize = (size_t)file.tellg(); //tellg() gives us a position of the reader at the moment
+        std::vector<char> fileBuffer(fileSize);
+        file.seekg(0); // here we have set the reader at the beginning of the file
+        file.read(fileBuffer.data(), fileSize);
+        file.close();
+        return fileBuffer;
+    }
+    else {
+        throw std::runtime_error("Failed to open file!!!");
+    }
 }
 
 void startGlfw() {
@@ -330,6 +348,9 @@ void startVulkan() {
         ASSERT_VULKAN(result);
     }
        
+    auto shaderCodeVert = readFile("vert.spv");
+    auto shaderCodeFrag = readFile("frag.spv");
+
     delete[] swapchainImages;
     delete[] layers;
     delete[] extensions;

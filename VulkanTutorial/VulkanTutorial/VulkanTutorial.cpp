@@ -356,6 +356,14 @@ void startVulkan() {
     //std::cout << shaderCodeVert.size() << std::endl; 
     //std::cout << shaderCodeFrag.size() << std::endl; 
 
+    VkShaderModuleCreateInfo shaderCreateInfo;
+    shaderCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+    shaderCreateInfo.pNext = nullptr;
+    shaderCreateInfo.flags = 0;
+    shaderCreateInfo.codeSize = shaderCodeVert.size();
+	shaderCreateInfo.pCode = (uint32_t*)shaderCodeVert.data();
+
+
     delete[] swapchainImages;
     delete[] layers;
     delete[] extensions;

@@ -16,6 +16,8 @@ VkSurfaceKHR surface;
 VkDevice device;
 VkSwapchainKHR swapchain;
 VkImageView* imageViews;
+VkShaderModule shaderModuleVert;
+VkShaderModule shaderModuleFrag;
 uint32_t amountOfImagesInSwapchain = 0;
 GLFWwindow* window;
 
@@ -139,6 +141,18 @@ void startGlfw() {
     glfwWindowHint(GLFW_RESIZABLE, FALSE);
 
     window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan Tutorial", nullptr, nullptr);
+}
+
+void createShaderModule(const std::vector<char>& code, VkShaderModule* shaderModule) {
+	VkShaderModuleCreateInfo shaderCreateInfo;
+	shaderCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+	shaderCreateInfo.pNext = nullptr;
+	shaderCreateInfo.flags = 0;
+	shaderCreateInfo.codeSize = code.size();
+	shaderCreateInfo.pCode = (uint32_t*)code.data();
+
+    VkResult result = vkCreateShaderModule(device, &shaderCreateInfo, nullptr, shaderModule);
+    ASSERT_VULKAN(result);
 }
 
 void startVulkan() {
@@ -356,13 +370,8 @@ void startVulkan() {
     //std::cout << shaderCodeVert.size() << std::endl; 
     //std::cout << shaderCodeFrag.size() << std::endl; 
 
-    VkShaderModuleCreateInfo shaderCreateInfo;
-    shaderCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-    shaderCreateInfo.pNext = nullptr;
-    shaderCreateInfo.flags = 0;
-    shaderCreateInfo.codeSize = shaderCodeVert.size();
-	shaderCreateInfo.pCode = (uint32_t*)shaderCodeVert.data();
-
+    createShaderModule(shaderCodeVert, &shaderModuleVert);
+    createShaderModule(shaderCodeFrag, &shaderModuleFrag);
 
     delete[] swapchainImages;
     delete[] layers;
@@ -387,7 +396,8 @@ void shutdownVulkan() {
     }
 
     delete[] imageViews;
-
+    vkDestroyShaderModule(device, shaderModuleVert, nullptr);
+    vkDestroyShaderModule(device, shaderModuleFrag, nullptr);
     vkDestroySwapchainKHR(device, swapchain, nullptr);
     vkDestroyDevice(device, nullptr); // we didn't use our own allocator so we place here nullptr
     vkDestroySurfaceKHR(instance, surface, nullptr);

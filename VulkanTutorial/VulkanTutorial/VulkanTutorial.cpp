@@ -393,6 +393,16 @@ void startVulkan() {
 
     VkPipelineShaderStageCreateInfo shaderStages[] = { shaderStageCreateInfoVert, shaderStageCreateInfoFrag };
 
+    VkPipelineVertexInputStateCreateInfo vertexInputCreateInfo;
+    vertexInputCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+    vertexInputCreateInfo.pNext = nullptr;
+    vertexInputCreateInfo.flags = 0;
+    vertexInputCreateInfo.vertexBindingDescriptionCount = 0;
+    vertexInputCreateInfo.pVertexBindingDescriptions = nullptr;
+    vertexInputCreateInfo.vertexAttributeDescriptionCount = 0;
+    vertexInputCreateInfo.pVertexAttributeDescriptions = nullptr;
+
+
     delete[] swapchainImages;
     delete[] layers;
     delete[] extensions;

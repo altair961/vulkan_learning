@@ -373,6 +373,26 @@ void startVulkan() {
     createShaderModule(shaderCodeVert, &shaderModuleVert);
     createShaderModule(shaderCodeFrag, &shaderModuleFrag);
 
+    VkPipelineShaderStageCreateInfo shaderStageCreateInfoVert;
+    shaderStageCreateInfoVert.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    shaderStageCreateInfoVert.pNext = nullptr;
+    shaderStageCreateInfoVert.flags = 0;
+    shaderStageCreateInfoVert.stage = VK_SHADER_STAGE_VERTEX_BIT;
+    shaderStageCreateInfoVert.module = shaderModuleVert;
+    shaderStageCreateInfoVert.pName = "main"; // we show here, that enter point is a function "main" in the vertex shader
+    shaderStageCreateInfoVert.pSpecializationInfo = nullptr;
+
+    VkPipelineShaderStageCreateInfo shaderStageCreateInfoFrag;
+    shaderStageCreateInfoFrag.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    shaderStageCreateInfoFrag.pNext = nullptr;
+    shaderStageCreateInfoFrag.flags = 0;
+    shaderStageCreateInfoFrag.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+    shaderStageCreateInfoFrag.module = shaderModuleFrag;
+    shaderStageCreateInfoFrag.pName = "main"; // we show here, that enter point is a function "main" in the fragment shader
+    shaderStageCreateInfoFrag.pSpecializationInfo = nullptr;
+
+    VkPipelineShaderStageCreateInfo shaderStages[] = { shaderStageCreateInfoVert, shaderStageCreateInfoFrag };
+
     delete[] swapchainImages;
     delete[] layers;
     delete[] extensions;

@@ -1,4 +1,4 @@
-#include "lve_pipeline.hpp"
+#include "lve_pipeline.h"
 #include <stdexcept>
 #include <fstream>
 #include <iostream>

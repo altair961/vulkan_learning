@@ -147,13 +147,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="first_app.cpp" />
+    <ClCompile Include="lve_device.cpp" />
     <ClCompile Include="lve_pipeline.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="lve_window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="first_app.h" />
-    <ClInclude Include="lve_pipeline.hpp" />
+    <ClInclude Include="lve_device.h" />
+    <ClInclude Include="lve_pipeline.h" />
     <ClInclude Include="lve_window.h" />
   </ItemGroup>
   <ItemGroup>

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "lve_window.h"
-#include "lve_pipeline.hpp"
+#include "lve_pipeline.h"
 
 namespace lve {
 	class FirstApp {

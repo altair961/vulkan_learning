@@ -30,18 +30,8 @@ namespace lve {
 
 	void FirstApp::loadModels()
 	{
-		std::vector<LveModel::Vertex> vertices
-		{
-		/*	{{0.0f, -0.5f}},
-			{{0.5f, 0.5f}},
-			{{-0.5f, 0.5f}}*/
-			//,{{0.5f, 0.5f}},
-			//{{0.6f, 0.6f}},
-			//{{0.2f, 0.6f}}
-		};
-
-		getVertices(vertices, 6, { 0.0f, -0.5f }, { 0.5f, 0.5f }, { -0.5f, 0.5f });
-//		auto vertices = getVerticesHardCodedIndices(verticesParam);
+		std::vector<LveModel::Vertex> vertices;
+		getOneStepVertices(vertices, 6, { 0.0f, -0.5f }, { 0.5f, 0.5f }, { -0.5f, 0.5f });
 		lveModel = std::make_unique<LveModel>(lveDevice, vertices);
 	}
 
@@ -146,7 +136,7 @@ namespace lve {
 		}
 	}
 
-	void FirstApp::getVertices(
+	void FirstApp::getOneStepVertices(
 		std::vector<LveModel::Vertex>& vertices,
 		int depth,
 		glm::vec2 topVert,
@@ -159,92 +149,58 @@ namespace lve {
 		depth--;
 		if (depth > 0) 
 		{
-			auto mid0 = getMiddleVertex(topVert, rightVert);
-			auto mid1 = getMiddleVertex(rightVert, leftVert);
-			auto mid2 = getMiddleVertex(leftVert, topVert);
+			Triangle topTriangle = getTriangle(
+				lve::TriangleLocation::TopTriangle, topVert, rightVert, leftVert);
+			Triangle rightTriangle = getTriangle(
+				lve::TriangleLocation::RightTriangle, topVert, rightVert, leftVert);
+			Triangle leftTriangle = getTriangle(
+				lve::TriangleLocation::LeftTriangle, topVert, rightVert, leftVert);
 
-			LveModel::Vertex firstTriangleTop;
-			firstTriangleTop.position = topVert;
-		//	vertices.push_back(firstTriangleTop);
-
-			LveModel::Vertex firstTriangleRight;
-			firstTriangleRight.position = mid0;
-		//	vertices.push_back(firstTriangleRight);
-
-			LveModel::Vertex firstTriangleLeft;
-			firstTriangleLeft.position = mid2;
-		//	vertices.push_back(firstTriangleLeft);
-
-			LveModel::Vertex secondTriangleTop;
-			secondTriangleTop.position = mid0;
-		//	vertices.push_back(secondTriangleTop);
-
-			LveModel::Vertex secondTriangleRight;
-			secondTriangleRight.position = rightVert;
-		//	vertices.push_back(secondTriangleRight);
-
-			LveModel::Vertex secondTriangleLeft;
-			secondTriangleLeft.position = mid1;
-		//	vertices.push_back(secondTriangleLeft);
-
-			LveModel::Vertex thirdTriangleTop;
-			thirdTriangleTop.position = mid2;
-		//	vertices.push_back(thirdTriangleTop);
-
-			LveModel::Vertex thirdTriangleRight;
-			thirdTriangleRight.position = mid1;
-		//	vertices.push_back(thirdTriangleRight);
-
-			LveModel::Vertex thirdTriangleLeft;
-			thirdTriangleLeft.position = leftVert;
-		//	vertices.push_back(thirdTriangleLeft);
-
-			getVertices(vertices, depth, firstTriangleTop.position, firstTriangleRight.position, firstTriangleLeft.position);
-			getVertices(vertices, depth, secondTriangleTop.position, secondTriangleRight.position, secondTriangleLeft.position);
-			getVertices(vertices, depth, thirdTriangleTop.position, thirdTriangleRight.position, thirdTriangleLeft.position);
-
+			getOneStepVertices(vertices, depth, topTriangle.mTopVertex, topTriangle.mRightVertex, topTriangle.mLeftVertex);
+			getOneStepVertices(vertices, depth, rightTriangle.mTopVertex, rightTriangle.mRightVertex, rightTriangle.mLeftVertex);
+			getOneStepVertices(vertices, depth, leftTriangle.mTopVertex, leftTriangle.mRightVertex, leftTriangle.mLeftVertex);
 		}
 		else if (depth == 0)
 		{
-			auto mid0 = getMiddleVertex(topVert, rightVert);
-			auto mid1 = getMiddleVertex(rightVert, leftVert);
-			auto mid2 = getMiddleVertex(leftVert, topVert);
+			Triangle topTriangle = getTriangle(
+				lve::TriangleLocation::TopTriangle, topVert, rightVert, leftVert);
+			Triangle rightTriangle = getTriangle(
+				lve::TriangleLocation::RightTriangle, topVert, rightVert, leftVert);
+			Triangle leftTriangle = getTriangle(
+				lve::TriangleLocation::LeftTriangle, topVert, rightVert, leftVert);
 
-			LveModel::Vertex firstTriangleTop;
-			firstTriangleTop.position = topVert;
-			vertices.push_back(firstTriangleTop);
+			LveModel::Vertex topTriangleTopVertex;
+			topTriangleTopVertex.position = topTriangle.mTopVertex;
+			LveModel::Vertex topTriangleRightVertex;
+			topTriangleRightVertex.position = topTriangle.mRightVertex;
+			LveModel::Vertex topTriangleLeftVertex;
+			topTriangleLeftVertex.position = topTriangle.mLeftVertex;
+			
+			LveModel::Vertex rightTriangleTopVertex;
+			rightTriangleTopVertex.position = rightTriangle.mTopVertex;
+			LveModel::Vertex rightTriangleRightVertex;
+			rightTriangleRightVertex.position = rightTriangle.mRightVertex;
+			LveModel::Vertex rightTriangleLeftVertex;
+			rightTriangleLeftVertex.position = rightTriangle.mLeftVertex;
+			
+			LveModel::Vertex leftTriangleTopVertex;
+			leftTriangleTopVertex.position = leftTriangle.mTopVertex;
+			LveModel::Vertex leftTriangleRightVertex;
+			leftTriangleRightVertex.position = leftTriangle.mRightVertex;
+			LveModel::Vertex leftTriangleLeftVertex;
+			leftTriangleLeftVertex.position = leftTriangle.mLeftVertex;
 
-			LveModel::Vertex firstTriangleRight;
-			firstTriangleRight.position = mid0;
-			vertices.push_back(firstTriangleRight);
+			vertices.push_back(topTriangleTopVertex);
+			vertices.push_back(topTriangleRightVertex);
+			vertices.push_back(topTriangleLeftVertex);
 
-			LveModel::Vertex firstTriangleLeft;
-			firstTriangleLeft.position = mid2;
-			vertices.push_back(firstTriangleLeft);
+			vertices.push_back(rightTriangleTopVertex);
+			vertices.push_back(rightTriangleRightVertex);
+			vertices.push_back(rightTriangleLeftVertex);
 
-			LveModel::Vertex secondTriangleTop;
-			secondTriangleTop.position = mid0;
-			vertices.push_back(secondTriangleTop);
-
-			LveModel::Vertex secondTriangleRight;
-			secondTriangleRight.position = rightVert;
-			vertices.push_back(secondTriangleRight);
-
-			LveModel::Vertex secondTriangleLeft;
-			secondTriangleLeft.position = mid1;
-			vertices.push_back(secondTriangleLeft);
-
-			LveModel::Vertex thirdTriangleTop;
-			thirdTriangleTop.position = mid2;
-			vertices.push_back(thirdTriangleTop);
-
-			LveModel::Vertex thirdTriangleRight;
-			thirdTriangleRight.position = mid1;
-			vertices.push_back(thirdTriangleRight);
-
-			LveModel::Vertex thirdTriangleLeft;
-			thirdTriangleLeft.position = leftVert;
-			vertices.push_back(thirdTriangleLeft);
+			vertices.push_back(leftTriangleTopVertex);
+			vertices.push_back(leftTriangleRightVertex);
+			vertices.push_back(leftTriangleLeftVertex);
 		}
 	}
 
@@ -257,14 +213,28 @@ namespace lve {
 		return midVert;
 	}
 
-	LveModel::Vertex FirstApp::getMiddleVertexOLD(LveModel::Vertex firstVertex, LveModel::Vertex secondVertex)
+	Triangle FirstApp::getTriangle(lve::TriangleLocation triangleLocation,
+		glm::vec2 topVertex, glm::vec2 rightVertex, glm::vec2 leftVertex)
 	{
-		auto resultX = (firstVertex.position.x + secondVertex.position.x) / 2;
-		auto resultY = (firstVertex.position.y + secondVertex.position.y) / 2;
-		auto midVert = LveModel::Vertex();
-		midVert.position.x = resultX;
-		midVert.position.y = resultY;
+		if (triangleLocation == lve::TriangleLocation::TopTriangle) 
+		{
+			auto topTriangle = lve::Triangle(topVertex, getMiddleVertex(topVertex,
+				rightVertex), getMiddleVertex(leftVertex, topVertex));
+			return topTriangle;
+		}
 
-		return midVert;
+		if (triangleLocation == lve::TriangleLocation::RightTriangle)
+		{
+			auto rightTriangle = lve::Triangle(getMiddleVertex(topVertex, rightVertex),
+				rightVertex, getMiddleVertex(rightVertex, leftVertex));
+			return rightTriangle;
+		}
+
+		if (triangleLocation == lve::TriangleLocation::LeftTriangle)
+		{
+			auto leftTriangle = lve::Triangle(getMiddleVertex(leftVertex, topVertex),
+				getMiddleVertex(rightVertex, leftVertex), leftVertex);
+			return leftTriangle;
+		}
 	}
 }

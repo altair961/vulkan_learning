@@ -6,6 +6,8 @@
 #include "lve_window.h" 
 #include "lve_model.h" 
 #include <memory>
+#include "triangle.h"
+#include "triangle_location.h"
 
 namespace lve {
 	class FirstApp {
@@ -28,15 +30,15 @@ namespace lve {
 		void createPipeline();
 		void createCommandBuffers();
 		void drawFrame();
-		void getVertices(
+		Triangle getTriangle(lve::TriangleLocation triangleLocation, 
+			glm::vec2 topVertex, glm::vec2 rightVertex, glm::vec2 leftVertex);
+		void getOneStepVertices(
 			std::vector<LveModel::Vertex> &vertices, 
 			int depth, 
 			glm::vec2 topVert,
 			glm::vec2 rightVert,
 			glm::vec2 leftVert
 		);
-		std::vector<LveModel::Vertex> getVerticesHardCodedIndices(std::vector<LveModel::Vertex> vertices);
-		LveModel::Vertex getMiddleVertexOLD(LveModel::Vertex firstVertex, LveModel::Vertex secondVertex);
 		glm::vec2 getMiddleVertex(glm::vec2 firstVertex, glm::vec2 secondVertex);
 
 		LveWindow lveWindow{ WIDTH, HEIGHT, "Hello Vulkan!" };
